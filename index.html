@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Quick QR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="ambient ambient-c"></div>
+  <div class="ambient-grid"></div>
+
+
+  <div class="app-shell">
+ <header class="hero glass">
+    <div class="hero-brand">
+        <img src="logo.png" alt="Quick QR logo" class="site-logo" />
+        <div class="hero-title">
+            <h1>Quick QR</h1>
+        </div>
+    </div>
+
+    <button
+        id="themeToggle"
+        class="theme-toggle"
+        type="button"
+        aria-label="Toggle theme">
+        Light Mode
+    </button>
+</header>
+
+    <main class="dashboard">
+      <section class="glass panel editor-panel">
+        <div class="section-head">
+          <div>
+            <h2>QR Content</h2>
+            <p>Choose a content type and we will format the payload for you.</p>
+          </div>
+          <div id="statusBadge" class="status-badge" data-tone="neutral">Ready</div>
+        </div>
+
+        <div class="type-toolbar">
+          <label class="field field-span-2">
+            <span>QR Type</span>
+            <select id="contentType">
+              <option value="url">URL</option>
+              <option value="pdf">PDF</option>
+              <option value="image">Image URL</option>
+              <option value="multi-url">Multi URL</option>
+              <option value="contact">Contact (vCard)</option>
+              <option value="email">Email</option>
+              <option value="sms">SMS</option>
+              <option value="wifi">WiFi</option>
+              <option value="store">App Store</option>
+              <option value="text">Plain Text</option>
+            </select>
+          </label>
+          <div id="typeHint" class="type-hint"></div>
+        </div>
+
+        <div class="type-panels">
+          <section class="type-section" data-type-section="url">
+            <div class="section-subhead">URL</div>
+            <label class="field field-span-2">
+              <span>Website Link</span>
+              <input id="urlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" />
+            </label>
+          </section>
+
+          <section class="type-section" data-type-section="pdf">
+            <div class="section-subhead">PDF</div>
+            <label class="field field-span-2">
+              <span>PDF Link</span>
+              <input id="pdfInput" type="url" inputmode="url" placeholder="https://example.com/document.pdf" />
+            </label>
+          </section>
+
+          <section class="type-section" data-type-section="image">
+            <div class="section-subhead">Image</div>
+            <label class="field field-span-2">
+              <span>Image Link</span>
+              <input id="imageInput" type="url" inputmode="url" placeholder="https://example.com/image.jpg" />
+            </label>
+          </section>
+
+          <section class="type-section" data-type-section="multi-url">
+            <div class="section-subhead">Multi URL</div>
+            <label class="field field-span-2">
+              <span>URLs</span>
+              <textarea id="multiUrlInput" rows="4" placeholder="One URL per line"></textarea>
+            </label>
+          </section>
+
+          <section class="type-section" data-type-section="contact">
+            <div class="section-subhead">Contact vCard</div>
+            <div class="form-grid">
+              <label class="field"><span>Name</span><input id="contactName" type="text" autocomplete="name" placeholder="John Doe" /></label>
+              <label class="field"><span>Phone</span><input id="contactPhone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567" /></label>
+              <label class="field"><span>Email</span><input id="contactEmail" type="email" autocomplete="email" placeholder="hello@example.com" /></label>
+              <label class="field"><span>Company</span><input id="contactCompany" type="text" autocomplete="organization" placeholder="Acme Studio" /></label>
+              <label class="field field-span-2"><span>Website</span><input id="contactWebsite" type="url" inputmode="url" placeholder="https://example.com" /></label>
+              <label class="field field-span-2"><span>Address</span><textarea id="contactAddress" rows="2" placeholder="Street, City, Country"></textarea></label>
+            </div>
+          </section>
+
+          <section class="type-section" data-type-section="email">
+            <div class="section-subhead">Email</div>
+            <div class="form-grid">
+              <label class="field field-span-2"><span>To</span><input id="emailTo" type="email" autocomplete="email" placeholder="support@example.com" /></label>
+              <label class="field"><span>Subject</span><input id="emailSubject" type="text" placeholder="Let's talk" /></label>
+              <label class="field"><span>Message</span><input id="emailBody" type="text" placeholder="Hello, I'm interested in..." /></label>
+            </div>
+          </section>
+
+          <section class="type-section" data-type-section="sms">
+            <div class="section-subhead">SMS</div>
+            <div class="form-grid">
+              <label class="field"><span>Phone Number</span><input id="smsPhone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567" /></label>
+              <label class="field"><span>Message</span><input id="smsMessage" type="text" placeholder="Hi, please call me back." /></label>
+            </div>
+          </section>
+
+          <section class="type-section" data-type-section="wifi">
+            <div class="section-subhead">WiFi</div>
+            <div class="form-grid">
+              <label class="field"><span>SSID</span><input id="wifiSsid" type="text" placeholder="Network name" /></label>
+              <label class="field"><span>Password</span><input id="wifiPassword" type="text" placeholder="Password" /></label>
+              <label class="field"><span>Security</span>
+                <select id="wifiSecurity">
+                  <option value="WPA" selected>WPA / WPA2 / WPA3</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">None</option>
+                </select>
+              </label>
+              <label class="field"><span>Hidden Network</span>
+                <select id="wifiHidden">
+                  <option value="false" selected>No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="type-section" data-type-section="store">
+            <div class="section-subhead">App Store / Play Store</div>
+            <div class="form-grid">
+              <label class="field"><span>Store</span>
+                <select id="storePlatform">
+                  <option value="app-store">App Store</option>
+                  <option value="play-store">Play Store</option>
+                </select>
+              </label>
+              <label class="field"><span>Store Link</span><input id="storeUrl" type="url" inputmode="url" placeholder="https://apps.apple.com/... or https://play.google.com/..." /></label>
+            </div>
+          </section>
+
+          <section class="type-section" data-type-section="text">
+            <div class="section-subhead">Plain Text</div>
+            <label class="field field-span-2">
+              <span>Text</span>
+              <textarea id="textInput" rows="4" placeholder="Any notes, promo text, or instructions"></textarea>
+            </label>
+          </section>
+        </div>
+
+        <div class="design-card">
+          <div class="section-head compact-head">
+            <div>
+              <h2>QR Customization</h2>
+              <p>Fine tune size, colors, gradients, module shape, and scan safety.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label class="field"><span>QR Size</span><input id="qrSize" type="range" min="256" max="1024" step="8" value="480" /></label>
+            <label class="field"><span>QR Margin</span><input id="qrMargin" type="range" min="0" max="32" step="1" value="16" /></label>
+            <label class="field"><span>Error Correction</span>
+              <select id="errorCorrection">
+                <option value="H" selected>High (H)</option>
+                <option value="Q">Quartile (Q)</option>
+                <option value="M">Medium (M)</option>
+                <option value="L">Low (L)</option>
+              </select>
+            </label>
+            <label class="field"><span>Module Style</span>
+              <select id="moduleStyle">
+                <option value="rounded" selected>Rounded</option>
+                <option value="square">Square</option>
+                <option value="dot">Dot</option>
+                <option value="instagram">Instagram-style</option>
+              </select>
+            </label>
+            <label class="field"><span>Finder Pattern</span>
+              <select id="finderStyle">
+                <option value="rounded" selected>Rounded</option>
+                <option value="square">Square</option>
+                <option value="modern">Modern</option>
+              </select>
+            </label>
+            <label class="field"><span>Corner Dot Style</span>
+              <select id="cornerDotStyle">
+                <option value="rounded" selected>Rounded</option>
+                <option value="square">Square</option>
+                <option value="dot">Dot</option>
+              </select>
+            </label>
+            <label class="field"><span>Gradient Type</span>
+              <select id="gradientType">
+                <option value="solid">Solid</option>
+                <option value="linear">Linear Gradient</option>
+                <option value="radial">Radial Gradient</option>
+              </select>
+            </label>
+
+            <div class="gradient-card field-span-2">
+              <div id="solidGroup" class="gradient-grid">
+                <label class="field"><span>Solid Color</span><input id="solidColor" type="color" value="#000000" /></label>
+              </div>
+              <div id="linearGroup" class="gradient-grid hidden">
+                <label class="field"><span>Linear Start</span><input id="linearStart" type="color" value="#000000" /></label>
+                <label class="field"><span>Linear End</span><input id="linearEnd" type="color" value="#000000" /></label>
+                <label class="field field-span-2"><span>Angle</span><input id="gradientAngle" type="range" min="0" max="360" step="1" value="135" /></label>
+              </div>
+              <div id="radialGroup" class="gradient-grid hidden">
+                <label class="field"><span>Radial Start</span><input id="radialStart" type="color" value="#000000" /></label>
+                <label class="field"><span>Radial End</span><input id="radialEnd" type="color" value="#000000" /></label>
+              </div>
+            </div>
+
+            <label class="field"><span>Background Color</span><input id="bgColor" type="color" value="#ffffff" /></label>
+            <label class="field field-span-2 toggle-field">
+              <span>Auto Theme Matching</span>
+              <label class="switch-row">
+                <input id="autoThemeMatch" type="checkbox" checked />
+                <span>Match logo colors without overwriting manual selections</span>
+              </label>
+            </label>
+            <label class="field field-span-2">
+              <span>Preset Mood</span>
+              <select id="stylePreset">
+                <option value="premium" selected>Premium Rounded</option>
+                <option value="square">Clean Square</option>
+                <option value="dot">Dot Grid</option>
+                <option value="instagram">Instagram-style</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="logo-card">
+          <div class="section-head compact-head">
+            <div>
+              <h2>Logo Features</h2>
+              <p>Upload a logo and keep it centered without sacrificing scan accuracy.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label class="field field-span-2">
+              <span>Logo Mode</span>
+              <select id="logoMode">
+                <option value="none" selected>No Logo</option>
+                <option value="center">Center Logo</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="logoControls" class="logo-controls hidden">
+            <div id="logoDropzone" class="file-drop" tabindex="0" role="button" aria-label="Upload logo by dragging and dropping or browsing">
+              <input id="logoUpload" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml" />
+              <strong>Drag & Drop Logo</strong>
+              <span>PNG, JPG, or SVG</span>
+              <small>Browse, replace, or remove. The QR stays scan friendly.</small>
+            </div>
+
+            <div class="logo-actions">
+              <button id="browseLogoBtn" class="secondary-btn" type="button">Browse Logo</button>
+              <button id="replaceLogoBtn" class="secondary-btn" type="button">Replace Logo</button>
+              <button id="removeLogoBtn" class="secondary-btn" type="button">Remove Logo</button>
+            </div>
+
+            <div class="logo-preview-shell">
+              <img id="logoPreview" class="logo-preview hidden" alt="Uploaded logo preview" />
+            </div>
+
+            <div class="form-grid logo-grid">
+              <label class="field"><span>Logo Size</span><input id="logoSize" type="range" min="8" max="28" step="1" value="18" /></label>
+              <label class="field"><span>Logo Info</span><input id="logoInfo" type="text" value="" readonly /></label>
+            </div>
+
+            <div class="logo-checks">
+              <div id="logoSafety" class="pill-indicator">Protected</div>
+              <div id="scanQuality" class="pill-indicator">High</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button id="generateBtn" class="primary-btn" type="button">Generate QR</button>
+          <button id="copyTextBtn" class="secondary-btn" type="button">Copy Payload</button>
+          <button id="resetBtn" class="secondary-btn" type="button">Reset All</button>
+        </div>
+
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="glass panel preview-panel">
+        <div class="section-head">
+          <div>
+            <h2>Live Preview</h2>
+            <p>Instant updates with a centered preview and clean export outputs.</p>
+          </div>
+        </div>
+
+        <div class="preview-stage">
+          <div class="preview-card">
+            <div id="qrcode" class="qrcode-host" aria-label="QR code preview"></div>
+            <div id="emptyState" class="empty-state">
+              <strong>Your QR will appear here</strong>
+              <span>Add content to generate the preview.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-meta">
+          <div class="preview-meta-item">
+            <span>QR Size</span>
+            <strong id="previewSize">480px</strong>
+          </div>
+          <div class="preview-meta-item">
+            <span>Logo Safety</span>
+            <strong id="previewLogoSafety">Protected</strong>
+          </div>
+          <div class="preview-meta-item">
+            <span>Scan Quality</span>
+            <strong id="previewScanQuality">High</strong>
+          </div>
+          <div class="preview-meta-item preview-wide">
+            <span>Current Mode</span>
+            <strong id="previewMode">Premium Rounded</strong>
+          </div>
+        </div>
+
+        <div class="button-grid">
+          <button id="downloadPngBtn" class="secondary-btn" type="button">Download PNG</button>
+          <button id="downloadSvgBtn" class="secondary-btn" type="button">Download SVG</button>
+          <button id="downloadJpgBtn" class="secondary-btn" type="button">Download JPG</button>
+          <button id="downloadPdfBtn" class="secondary-btn" type="button">Download PDF</button>
+          <button id="copyImageBtn" class="secondary-btn" type="button">Copy QR</button>
+          <button id="printBtn" class="secondary-btn" type="button">Print QR</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
